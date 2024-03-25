@@ -3,6 +3,7 @@ import numpy as np
 
 #calculate utility for one action, but also tke in mind the probability in reaching others
 def calculate_bellman(mdp, U, i, j, action):
+    dict = {'UP': 0, 'DOWN': 1, 'RIGHT': 2, 'LEFT': 3}
     sum = 0
     #the probabilitie in taking the current action
     prob = mdp.transition_function[action]
@@ -10,7 +11,7 @@ def calculate_bellman(mdp, U, i, j, action):
         #getting the next step we reach if we take a
         i_next, j_next = mdp.step((i,j), a)
         #not sure prob[a] works
-        sum += prob[a] * U[i_next][j_next]
+        sum += prob[dict[a]] * U[i_next][j_next]
     return sum
 
 def value_iteration(mdp, U_init, epsilon=10 ** (-3)):
