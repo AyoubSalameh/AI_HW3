@@ -1,6 +1,17 @@
 from copy import deepcopy
 import numpy as np
 
+#calculate utility for one action, but also tke in mind the probability in reaching others
+def calculate_bellman(mdp, U, i, j, action):
+    sum = 0
+    #the probabilitie in taking the current action
+    prob = mdp.transition_function[action]
+    for a in mdp.actions.keys():
+        #getting the next step we reach if we take a
+        i_next, j_next = mdp.step((i,j), a)
+        #not sure prob[a] works
+        sum += prob[a] * U[i_next][j_next]
+    return sum
 
 def value_iteration(mdp, U_init, epsilon=10 ** (-3)):
     # TODO:
@@ -11,7 +22,27 @@ def value_iteration(mdp, U_init, epsilon=10 ** (-3)):
     #
 
     # ====== YOUR CODE: ======
-    raise NotImplementedError
+    U_tag = deepcopy(U_init)
+    U = []
+    while True:
+        delta = 0
+        U = deepcopy(U_tag)
+        #TODO: code
+        for i in mdp.num_row:
+            for j in mdp.num_col:
+                if mdp.board[i][j] == 'WALL':
+                    continue
+            reward = mdp.board[i][j]
+            #TODO: make sure the helper function works. currently its a black box
+            probabilities = [calculate_bellman(mdp, U, i, j, action) for action in mdp.action.keys()]
+            max_util = max(probabilities)
+            U_tag[i][j] = reward + mdp.gamma * max_util
+            if abs(U_tag[i][j] - U[i][j]) > delta:
+                delta = abs(U_tag[i][j] - U[i][j])
+
+        if delta < epsilon * (1 - mdp.gamma) / mdp.gamma:
+            break
+    return U
     # ========================
 
 
