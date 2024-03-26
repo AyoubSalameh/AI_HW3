@@ -1,7 +1,7 @@
 import argparse
 import os
 from mdp import MDP
-from mdp_implementation import value_iteration, get_policy, policy_evaluation, policy_iteration
+from mdp_implementation import value_iteration, get_policy, policy_evaluation, policy_iteration, get_all_policies
 
 
 def is_valid_file(parser, arg):
@@ -96,8 +96,11 @@ def example_driver():
 
     print("Done!")
 
+    mdp.print_policy(get_all_policies(mdp, U_new))
+
 
 if __name__ == '__main__':
 
     # run our example
     example_driver()
+

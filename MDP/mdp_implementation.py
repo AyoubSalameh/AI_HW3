@@ -176,7 +176,24 @@ def get_all_policies(mdp, U):  # You can add more input parameters as needed
     #
 
     # ====== YOUR CODE: ======
-    raise NotImplementedError
+    pi = deepcopy(U)
+    count = 0
+    for i in range(mdp.num_row):
+        for j in range(mdp.num_col):
+            if mdp.board[i][j] == 'WALL' or (i, j) in mdp.terminal_states:
+                pi[i][j] = None
+            cur_max = float('-inf')
+            for a in mdp.actions.keys():
+                cur = calculate_sum(mdp, U, i, j, a)
+                if cur >= cur_max:
+                    if cur == cur_max:
+                        count+=1
+                        pi[i][j] = str(pi[i][j]) + a
+                        #print(pi[i][j])
+                    else:
+                        cur_max = cur
+                        pi[i][j] = a
+    return pi
     # ========================
 
 
