@@ -2,7 +2,7 @@ from copy import deepcopy
 import numpy as np
 
 #calculate utility for one action, but also tke in mind the probability in reaching others
-def calculate_bellman(mdp, U, i, j, action):
+def calculate_sum(mdp, U, i, j, action):
     dict = {'UP': 0, 'DOWN': 1, 'RIGHT': 2, 'LEFT': 3}
     sum = 0
     #the probabilitie in taking the current action
@@ -10,10 +10,34 @@ def calculate_bellman(mdp, U, i, j, action):
     for a in mdp.actions.keys():
         #getting the next step we reach if we take a
         i_next, j_next = mdp.step((i,j), a)
-        #not sure prob[a] works
         sum += prob[dict[a]] * U[i_next][j_next]
     return sum
 
+#TODO: not sure these two helpers work
+def num_to_indices(mdp, state):
+    row = state // mdp.num_col
+    col = state % mdp.num_col
+    return (row, col)
+
+def indices_to_num(mdp, i, j):
+    return i * mdp.num_col + j
+
+def probability_src_to_dest(mdp, src, dest, policy):
+    dict = {'UP': 0, 'DOWN': 1, 'RIGHT': 2, 'LEFT': 3}
+    prob = 0
+    src_idx = num_to_indices(mdp, src)
+    policy_action = policy[src_idx[0]][src_idx[1]]
+    if src_idx in mdp.terminal_states or mdp.board[src_idx[0]][src_idx[1]] == 'WALL':
+        return 0
+    dest_idx = num_to_indices(mdp, dest)
+    for action in mdp.actions.keys():
+        if dest_idx == mdp.step(src_idx, action):
+            prob += mdp.transition_function[policy_action][dict[action]]
+
+    return prob
+
+
+#TODO: make sure if we should iterate over all states or over final states
 def value_iteration(mdp, U_init, epsilon=10 ** (-3)):
     # TODO:
     # Given the mdp, the initial utility of each state - U_init,
@@ -24,22 +48,23 @@ def value_iteration(mdp, U_init, epsilon=10 ** (-3)):
 
     # ====== YOUR CODE: ======
     U_tag = deepcopy(U_init)
-    U = []
     while True:
         delta = 0
         U = deepcopy(U_tag)
-        #TODO: code
-        for i in mdp.num_row:
-            for j in mdp.num_col:
+        for i in range(mdp.num_row):
+            for j in range(mdp.num_col):
                 if mdp.board[i][j] == 'WALL':
                     continue
-            reward = mdp.board[i][j]
-            #TODO: make sure the helper function works. currently its a black box
-            probabilities = [calculate_bellman(mdp, U, i, j, action) for action in mdp.action.keys()]
-            max_util = max(probabilities)
-            U_tag[i][j] = reward + mdp.gamma * max_util
-            if abs(U_tag[i][j] - U[i][j]) > delta:
-                delta = abs(U_tag[i][j] - U[i][j])
+                elif (i, j) in mdp.terminal_states:
+                    U_tag[i][j] = float(mdp.board[i][j])
+                    continue
+                else:
+                    reward = mdp.board[i][j]
+                    sums = [calculate_sum(mdp, U, i, j, action) for action in mdp.actions.keys()]
+                    max_util = max(sums)
+                    U_tag[i][j] = float(reward) + mdp.gamma * max_util
+                if abs(U_tag[i][j] - U[i][j]) > delta:
+                    delta = abs(U_tag[i][j] - U[i][j])
 
         if delta < epsilon * (1 - mdp.gamma) / mdp.gamma:
             break
@@ -54,10 +79,22 @@ def get_policy(mdp, U):
     #
 
     # ====== YOUR CODE: ======
-    raise NotImplementedError
+    pi = deepcopy(U)
+    for i in range(mdp.num_row):
+        for j in range(mdp.num_col):
+            if mdp.board[i][j] == 'WALL' or (i,j) in mdp.terminal_states:
+                pi[i][j] = None
+            cur_max = float('-inf')
+            for a in mdp.actions.keys():
+                cur = calculate_sum(mdp, U, i, j, a)
+                if cur > cur_max:
+                    cur_max = cur
+                    pi[i][j] = a
+    return pi
     # ========================
 
-
+#TODO: make sure np.array().T is a column vector
+#TODO: know what to put in the matrices in wall/terminals
 def policy_evaluation(mdp, policy):
     # TODO:
     # Given the mdp, and a policy
@@ -65,10 +102,38 @@ def policy_evaluation(mdp, policy):
     #
 
     # ====== YOUR CODE: ======
-    raise NotImplementedError
+    U_ret = deepcopy(policy)
+    n = mdp.num_row*mdp.num_col
+    '''creating a reward vector'''
+
+    rewards = []
+    for i in range(mdp.num_row):
+        for j in range(mdp.num_col):
+            if(mdp.board[i][j] == 'WALL'):
+                rewards.append(float('0'))
+                continue
+            rewards.append(float(mdp.board[i][j]))
+    rewards = np.array(rewards).T
+
+    '''creating probabilities matrix'''
+    #nxn matrix
+    trans = np.zeros((n, n))
+    for dest in range(trans.shape[0]):
+        for src in range(trans.shape[1]):
+            #trans[src][dest] is the probability of going src -> dest
+            trans[src][dest] = probability_src_to_dest(mdp, src, dest, policy)
+
+    identity = np.identity(n)
+
+    U = np.linalg.inv((identity - mdp.gamma * trans)) @ rewards
+    for state, utility in enumerate(U):
+        idx = num_to_indices(mdp, state)
+        U_ret[idx[0]][idx[1]] = utility
+
+    return U_ret
     # ========================
 
-
+#TODO: make sure if we should iterate over all states or over final states
 def policy_iteration(mdp, policy_init):
     # TODO:
     # Given the mdp, and the initial policy - policy_init
@@ -77,7 +142,23 @@ def policy_iteration(mdp, policy_init):
     #
 
     # ====== YOUR CODE: ======
-    raise NotImplementedError
+    while True:
+        U = policy_evaluation(mdp, policy_init)
+        unchanged = True
+        for i in range(mdp.num_row):
+            for j in range(mdp.num_col):
+                if mdp.board[i][j] == 'WALL' or (i,j) in mdp.terminal_states:
+                    policy_init[i][j] = None
+                    continue
+                sums = [(calculate_sum(mdp, U, i, j, action), action) for action in mdp.actions.keys()]
+                max_util = max(sums)
+                curr_util = calculate_sum(mdp, U, i, j, policy_init[i][j])
+                if curr_util < max_util[0]:
+                    policy_init[i][j] = max_util[1]
+                    unchanged = False
+        if unchanged:
+            return policy_init
+
     # ========================
 
 
