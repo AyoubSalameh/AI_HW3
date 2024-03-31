@@ -1,6 +1,7 @@
 from copy import deepcopy
 import numpy as np
 
+
 #calculate utility for one action, but also tke in mind the probability in reaching others
 def calculate_sum(mdp, U, i, j, action):
     dict = {'UP': 0, 'DOWN': 1, 'RIGHT': 2, 'LEFT': 3}
@@ -205,6 +206,26 @@ def get_all_policies(mdp, U):  # You can add more input parameters as needed
     return pi
     # ========================
 
+def create_board_with_reward(mdp, reward):
+    new_board = deepcopy(mdp.board)
+    for i in range(mdp.num_row):
+        for j in range(mdp.num_col):
+            if mdp.board[i][j] == "WALL" or (i,j) in mdp.terminal_states:
+                new_board[i][j] = mdp.board[i][j]
+            else:
+                new_board[i][j] = str(reward)
+    return new_board
+
+def policy_changed(mdp, old_policy, new_policy):
+    if old_policy is None:
+        return True
+    for i in range(mdp.num_row):
+        for j in range(mdp.num_col):
+            if mdp.board[i][j] == "WALL" or (i,j) in mdp.terminal_states:
+                continue
+            if old_policy[i][j] != new_policy[i][j]:
+                return True
+    return False
 
 def get_policy_for_different_rewards(mdp):  # You can add more input parameters as needed
     # TODO:
@@ -214,5 +235,30 @@ def get_policy_for_different_rewards(mdp):  # You can add more input parameters 
     #
 
     # ====== YOUR CODE: ======
-    raise NotImplementedError
+    current_reward = -5.0
+    all_rewards = []
+    prev_policy = None
+    #initial utility to send to value_iteration
+    initial_utility = [[0] * mdp.num_col for i in range(mdp.num_col)]
+    while current_reward < 5:
+
+        #with thie current reward, we need to create a board and a new mdp to send to policiy evaluation
+        #creating a new mdp with the updated board
+        current_reward = round(current_reward + 0.01, 2)
+        current_board = create_board_with_reward(mdp, current_reward)
+        current_mdp = deepcopy(mdp)
+        current_mdp.board = current_board
+
+        #calculate policy for current reward
+        #TODO: not sure which function we should use to calculate current policy. currently we use get_policy, but maybe we need get_all
+        #calculating the policy with value_iteration and get_policy, and if policy changed, add the reward to the list
+        current_util = value_iteration(current_mdp, initial_utility)
+        current_policy = get_policy(current_mdp, current_util)
+        #if the polict changed from the alst one
+        changed = policy_changed(current_mdp, prev_policy, current_policy)
+        if changed:
+            all_rewards.append(current_reward)
+        #setting the current to be prev
+        prev_policy = current_policy
+    return all_rewards
     # ========================
