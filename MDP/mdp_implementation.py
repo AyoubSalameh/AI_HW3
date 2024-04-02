@@ -179,31 +179,50 @@ def get_all_policies(mdp, U):  # You can add more input parameters as needed
     # ====== YOUR CODE: ======
     dict = {'UP': '↑', 'DOWN': '↓', 'RIGHT': '→', 'LEFT': '←'}
     pi = deepcopy(U)
-    count = 0
+
+    count = 1
     for i in range(mdp.num_row):
         for j in range(mdp.num_col):
             if mdp.board[i][j] == 'WALL' or (i, j) in mdp.terminal_states:
                 pi[i][j] = None
-            cur_max = float('-inf')
-            #print(i, j)
+                continue
+
+            '''different version'''
+            # cur_reward = float(mdp.board[i][j])
+            # possible_op = ''
+            # for a in mdp.actions.keys():
+            #     cur = calculate_sum(mdp, U, i, j, a)
+            #     #need to add the operation if bellman equation is true for it
+            #     if U[i][j] <= cur_reward + mdp.gamma * cur:
+            #         possible_op += dict[a]
+            # pi[i][j] = possible_op
+
+            """another diff version"""
+            ops = ''
+            max_sum = max([calculate_sum(mdp, U, i, j, action) for action in mdp.actions.keys()])
             for a in mdp.actions.keys():
                 cur = calculate_sum(mdp, U, i, j, a)
-                if cur >= cur_max:
-                    if cur == cur_max:
-                        #print("concatenating", dict[a], a)
-                        count+=1
-                        pi[i][j] = (pi[i][j]) + dict[a]
-                        #print(pi[i][j])
-                    else:
-                        #print("replacing ׳ןאי", dict[a], a)
-                        cur_max = cur
-                        pi[i][j] = dict[a]
+                if abs(cur - max_sum) < 10 ** (-3):
+                    ops += dict[a]
+            pi[i][j] = ops
+            count *= len(ops)
 
-    # for i in range(mdp.num_row):
-    #     for j in range(mdp.num_col):
-    #         print(pi[i][j])
+            # cur_max = float('-inf')
+            # #print(i, j)
+            # for a in mdp.actions.keys():
+            #     cur = calculate_sum(mdp, U, i, j, a)
+            #     if cur >= cur_max:
+            #         if cur == cur_max:
+            #             #print("concatenating", dict[a], a)
+            #             count+=1
+            #             pi[i][j] = (pi[i][j]) + dict[a]
+            #             #print(pi[i][j])
+            #         else:
+            #             #print("replacing ׳ןאי", dict[a], a)
+            #             cur_max = cur
+            #             pi[i][j] = dict[a]
 
-    return pi
+    return count
     # ========================
 
 def create_board_with_reward(mdp, reward):

@@ -96,9 +96,10 @@ def example_driver():
 
     print("Done!")
 
-    mdp.print_policy(get_all_policies(mdp, U_new))
-    list = get_policy_for_different_rewards(mdp)
-    print(list)
+    #mdp.print_policy(get_all_policies(mdp, U_new))
+    print(get_all_policies(mdp, U_new))
+    #list = get_policy_for_different_rewards(mdp)
+    #print(list)
 
 if __name__ == '__main__':
 
