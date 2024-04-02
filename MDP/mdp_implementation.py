@@ -179,7 +179,7 @@ def get_all_policies(mdp, U):  # You can add more input parameters as needed
     # ====== YOUR CODE: ======
     dict = {'UP': '↑', 'DOWN': '↓', 'RIGHT': '→', 'LEFT': '←'}
     pi = deepcopy(U)
-
+    mdp.print_utility(U)
     count = 1
     for i in range(mdp.num_row):
         for j in range(mdp.num_col):
@@ -188,24 +188,24 @@ def get_all_policies(mdp, U):  # You can add more input parameters as needed
                 continue
 
             '''different version'''
-            # cur_reward = float(mdp.board[i][j])
-            # possible_op = ''
-            # for a in mdp.actions.keys():
-            #     cur = calculate_sum(mdp, U, i, j, a)
-            #     #need to add the operation if bellman equation is true for it
-            #     if U[i][j] <= cur_reward + mdp.gamma * cur:
-            #         possible_op += dict[a]
-            # pi[i][j] = possible_op
-
-            """another diff version"""
-            ops = ''
-            max_sum = max([calculate_sum(mdp, U, i, j, action) for action in mdp.actions.keys()])
+            cur_reward = float(mdp.board[i][j])
+            possible_op = ''
             for a in mdp.actions.keys():
                 cur = calculate_sum(mdp, U, i, j, a)
-                if abs(cur - max_sum) < 10 ** (-3):
-                    ops += dict[a]
-            pi[i][j] = ops
-            count *= len(ops)
+                #need to add the operation if bellman equation is true for it
+                if abs(U[i][j] - (cur_reward + mdp.gamma * cur)) < 10**(-3):
+                    possible_op += dict[a]
+            pi[i][j] = possible_op
+
+            """another diff version"""
+            # ops = ''
+            # max_sum = max([calculate_sum(mdp, U, i, j, action) for action in mdp.actions.keys()])
+            # for a in mdp.actions.keys():
+            #     cur = calculate_sum(mdp, U, i, j, a)
+            #     if abs(cur - max_sum) < 10 ** (-3):
+            #         ops += dict[a]
+            # pi[i][j] = ops
+            # count *= len(ops)
 
             # cur_max = float('-inf')
             # #print(i, j)
