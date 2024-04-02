@@ -222,7 +222,7 @@ def get_all_policies(mdp, U):  # You can add more input parameters as needed
             #             cur_max = cur
             #             pi[i][j] = dict[a]
 
-    return count
+    return pi
     # ========================
 
 def create_board_with_reward(mdp, reward):
