@@ -167,7 +167,7 @@ def policy_iteration(mdp, policy_init):
 """For this functions, you can import what ever you want """
 
 
-def get_all_policies(mdp, U):  # You can add more input parameters as needed
+def get_all_policies(mdp, U, epsilon):  # You can add more input parameters as needed
     # TODO:
     # Given the mdp, and the utility value U (which satisfies the Belman equation)
     # print / display all the policies that maintain this value
@@ -177,6 +177,7 @@ def get_all_policies(mdp, U):  # You can add more input parameters as needed
     #
 
     # ====== YOUR CODE: ======
+    round_by = len(str(epsilon).split(".")[1]) + 1
     dict = {'UP': '↑', 'DOWN': '↓', 'RIGHT': '→', 'LEFT': '←'}
     pi = deepcopy(U)
     mdp.print_utility(U)
@@ -191,11 +192,13 @@ def get_all_policies(mdp, U):  # You can add more input parameters as needed
             cur_reward = float(mdp.board[i][j])
             possible_op = ''
             for a in mdp.actions.keys():
+                #TODO: here we should round based on epsilon we get as param. num of digits after the point + 1
                 cur = calculate_sum(mdp, U, i, j, a)
                 #need to add the operation if bellman equation is true for it
-                if abs(U[i][j] - (cur_reward + mdp.gamma * cur)) < 10**(-3):
+                if abs(round(U[i][j], round_by) - round(cur_reward + mdp.gamma * cur, round_by)) < epsilon:
                     possible_op += dict[a]
             pi[i][j] = possible_op
+            count *= len(possible_op)
 
             """another diff version"""
             # ops = ''
@@ -222,7 +225,7 @@ def get_all_policies(mdp, U):  # You can add more input parameters as needed
             #             cur_max = cur
             #             pi[i][j] = dict[a]
 
-    return pi
+    return count
     # ========================
 
 def create_board_with_reward(mdp, reward):
