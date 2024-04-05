@@ -303,6 +303,10 @@ def get_policy_for_different_rewards(mdp, epsilon):  # You can add more input pa
     prev_policy = None
     # initial utility to send to value_iteration
     initial_utility = [[0] * mdp.num_col for i in range(mdp.num_col)]
+    for terminal_state in mdp.terminal_states:
+        row, col = terminal_state
+        initial_utility[row][col] = float(mdp.board[row][col])
+
     while current_reward <= max_reward:
         current_reward = Decimal(round(current_reward + jump_value, 2))
         # with the current reward, we need to create a board and a new mdp to send to policiy evaluation

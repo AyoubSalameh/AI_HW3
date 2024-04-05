@@ -4,9 +4,6 @@ from mdp import MDP
 from mdp_implementation import value_iteration, get_policy, policy_evaluation, policy_iteration, get_all_policies, \
     get_policy_for_different_rewards, get_all_policies_letters_sorted
 
-
-# from mdp3 import value_iteration, get_policy, policy_evaluation, policy_iteration
-
 def is_valid_file(parser, arg):
     if not os.path.exists(arg):
         parser.error("The file %s does not exist!" % arg)
@@ -108,7 +105,7 @@ def example_driver():
     # _, p2 = get_all_policies_letters_sorted(mdp, U_new, 10 ** -3)
     # mdp.print_policy(p2)
 
-    r_list = get_policy_for_different_rewards(mdp, 10**-3)
+    r_list = get_policy_for_different_rewards(mdp, 10 ** -3)
     print(r_list)
 
 if __name__ == '__main__':
