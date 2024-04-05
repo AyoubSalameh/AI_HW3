@@ -1,27 +1,31 @@
 from copy import deepcopy
 import numpy as np
+from decimal import Decimal
 
 
-#calculate utility for one action, but also tke in mind the probability in reaching others
+# calculate utility for one action, but also tke in mind the probability in reaching others
 def calculate_sum(mdp, U, i, j, action):
     dict = {'UP': 0, 'DOWN': 1, 'RIGHT': 2, 'LEFT': 3}
     sum = 0
-    #the probabilitie in taking the current action
+    # the probabilitie in taking the current action
     prob = mdp.transition_function[action]
     for a in mdp.actions.keys():
-        #getting the next step we reach if we take a
-        i_next, j_next = mdp.step((i,j), a)
+        # getting the next step we reach if we take a
+        i_next, j_next = mdp.step((i, j), a)
         sum += prob[dict[a]] * U[i_next][j_next]
     return sum
 
-#TODO: not sure these two helpers work
+
+# TODO: not sure these two helpers work
 def num_to_indices(mdp, state):
     row = state // mdp.num_col
     col = state % mdp.num_col
     return (row, col)
 
+
 def indices_to_num(mdp, i, j):
     return i * mdp.num_col + j
+
 
 def probability_src_to_dest(mdp, src, dest, policy):
     dict = {'UP': 0, 'DOWN': 1, 'RIGHT': 2, 'LEFT': 3}
@@ -38,7 +42,7 @@ def probability_src_to_dest(mdp, src, dest, policy):
     return prob
 
 
-#TODO: make sure if we should iterate over all states or over final states
+# TODO: make sure if we should iterate over all states or over final states
 def value_iteration(mdp, U_init, epsilon=10 ** (-3)):
     # TODO:
     # Given the mdp, the initial utility of each state - U_init,
@@ -83,7 +87,7 @@ def get_policy(mdp, U):
     pi = deepcopy(U)
     for i in range(mdp.num_row):
         for j in range(mdp.num_col):
-            if mdp.board[i][j] == 'WALL' or (i,j) in mdp.terminal_states:
+            if mdp.board[i][j] == 'WALL' or (i, j) in mdp.terminal_states:
                 pi[i][j] = None
             cur_max = float('-inf')
             for a in mdp.actions.keys():
@@ -94,8 +98,9 @@ def get_policy(mdp, U):
     return pi
     # ========================
 
-#TODO: make sure np.array().T is a column vector
-#TODO: know what to put in the matrices in wall/terminals
+
+# TODO: make sure np.array().T is a column vector
+# TODO: know what to put in the matrices in wall/terminals
 def policy_evaluation(mdp, policy):
     # TODO:
     # Given the mdp, and a policy
@@ -104,24 +109,24 @@ def policy_evaluation(mdp, policy):
 
     # ====== YOUR CODE: ======
     U_ret = deepcopy(policy)
-    n = mdp.num_row*mdp.num_col
+    n = mdp.num_row * mdp.num_col
     '''creating a reward vector'''
 
     rewards = []
     for i in range(mdp.num_row):
         for j in range(mdp.num_col):
-            if(mdp.board[i][j] == 'WALL'):
+            if (mdp.board[i][j] == 'WALL'):
                 rewards.append(float('0'))
                 continue
             rewards.append(float(mdp.board[i][j]))
     rewards = np.array(rewards).T
 
     '''creating probabilities matrix'''
-    #nxn matrix
+    # nxn matrix
     trans = np.zeros((n, n))
     for dest in range(trans.shape[0]):
         for src in range(trans.shape[1]):
-            #trans[src][dest] is the probability of going src -> dest
+            # trans[src][dest] is the probability of going src -> dest
             trans[src][dest] = probability_src_to_dest(mdp, src, dest, policy)
 
     identity = np.identity(n)
@@ -134,7 +139,8 @@ def policy_evaluation(mdp, policy):
     return U_ret
     # ========================
 
-#TODO: make sure if we should iterate over all states or over final states
+
+# TODO: make sure if we should iterate over all states or over final states
 def policy_iteration(mdp, policy_init):
     # TODO:
     # Given the mdp, and the initial policy - policy_init
@@ -148,7 +154,7 @@ def policy_iteration(mdp, policy_init):
         unchanged = True
         for i in range(mdp.num_row):
             for j in range(mdp.num_col):
-                if mdp.board[i][j] == 'WALL' or (i,j) in mdp.terminal_states:
+                if mdp.board[i][j] == 'WALL' or (i, j) in mdp.terminal_states:
                     policy_init[i][j] = None
                     continue
                 sums = [(calculate_sum(mdp, U, i, j, action), action) for action in mdp.actions.keys()]
@@ -163,8 +169,37 @@ def policy_iteration(mdp, policy_init):
     # ========================
 
 
-
 """For this functions, you can import what ever you want """
+
+
+def get_all_policies_letters_sorted(mdp, U, epsilon):  # You can add more input parameters as needed
+    # the same function as get_all_policies, but it prints the first letter of each policy
+    # and put it in the cell ordered
+
+    # ====== YOUR CODE: ======
+    round_by = len(str(epsilon).split(".")[1]) + 1
+    p_dict = {'UP': 'U', 'DOWN': 'D', 'RIGHT': 'R', 'LEFT': 'L'}
+    pi = deepcopy(U)
+    count = 1
+    for i in range(mdp.num_row):
+        for j in range(mdp.num_col):
+            if mdp.board[i][j] == 'WALL' or (i, j) in mdp.terminal_states:
+                pi[i][j] = None
+                continue
+
+            '''different version'''
+            cur_reward = float(mdp.board[i][j])
+            possible_op = []
+            for a in mdp.actions.keys():
+                # TODO: here we should round based on epsilon we get as param. num of digits after the point + 1
+                cur = calculate_sum(mdp, U, i, j, a)
+                # need to add the operation if bellman equation is true for it
+                if abs(round(U[i][j], round_by) - round(cur_reward + mdp.gamma * cur, round_by)) < epsilon:
+                    possible_op.append(p_dict[a])
+            pi[i][j] = ''.join(sorted(possible_op))
+            count *= len(possible_op)
+
+    return count, pi
 
 
 def get_all_policies(mdp, U, epsilon):  # You can add more input parameters as needed
@@ -180,6 +215,7 @@ def get_all_policies(mdp, U, epsilon):  # You can add more input parameters as n
     round_by = len(str(epsilon).split(".")[1]) + 1
     dict = {'UP': '↑', 'DOWN': '↓', 'RIGHT': '→', 'LEFT': '←'}
     pi = deepcopy(U)
+    # TODO: is this print supposed to br here?
     mdp.print_utility(U)
     count = 1
     for i in range(mdp.num_row):
@@ -192,9 +228,9 @@ def get_all_policies(mdp, U, epsilon):  # You can add more input parameters as n
             cur_reward = float(mdp.board[i][j])
             possible_op = ''
             for a in mdp.actions.keys():
-                #TODO: here we should round based on epsilon we get as param. num of digits after the point + 1
+                # TODO: here we should round based on epsilon we get as param. num of digits after the point + 1
                 cur = calculate_sum(mdp, U, i, j, a)
-                #need to add the operation if bellman equation is true for it
+                # need to add the operation if bellman equation is true for it
                 if abs(round(U[i][j], round_by) - round(cur_reward + mdp.gamma * cur, round_by)) < epsilon:
                     possible_op += dict[a]
             pi[i][j] = possible_op
@@ -225,31 +261,34 @@ def get_all_policies(mdp, U, epsilon):  # You can add more input parameters as n
             #             cur_max = cur
             #             pi[i][j] = dict[a]
 
-    return count
+    return count, pi
     # ========================
+
 
 def create_board_with_reward(mdp, reward):
     new_board = deepcopy(mdp.board)
     for i in range(mdp.num_row):
         for j in range(mdp.num_col):
-            if mdp.board[i][j] == "WALL" or (i,j) in mdp.terminal_states:
+            if mdp.board[i][j] == "WALL" or (i, j) in mdp.terminal_states:
                 new_board[i][j] = mdp.board[i][j]
             else:
                 new_board[i][j] = str(reward)
     return new_board
+
 
 def policy_changed(mdp, old_policy, new_policy):
     if old_policy is None:
         return True
     for i in range(mdp.num_row):
         for j in range(mdp.num_col):
-            if mdp.board[i][j] == "WALL" or (i,j) in mdp.terminal_states:
+            if mdp.board[i][j] == "WALL" or (i, j) in mdp.terminal_states:
                 continue
             if old_policy[i][j] != new_policy[i][j]:
                 return True
     return False
 
-def get_policy_for_different_rewards(mdp):  # You can add more input parameters as needed
+
+def get_policy_for_different_rewards(mdp, epsilon):  # You can add more input parameters as needed
     # TODO:
     # Given the mdp
     # print / displas the optimal policy as a function of r
@@ -257,30 +296,32 @@ def get_policy_for_different_rewards(mdp):  # You can add more input parameters 
     #
 
     # ====== YOUR CODE: ======
-    current_reward = -5.0
+    current_reward = Decimal('-5.01')
+    max_reward = Decimal('5.0')
+    jump_value = Decimal('0.01')
     all_rewards = []
     prev_policy = None
-    #initial utility to send to value_iteration
+    # initial utility to send to value_iteration
     initial_utility = [[0] * mdp.num_col for i in range(mdp.num_col)]
-    while current_reward < 5:
-
-        #with thie current reward, we need to create a board and a new mdp to send to policiy evaluation
-        #creating a new mdp with the updated board
-        current_reward = round(current_reward + 0.01, 2)
+    while current_reward <= max_reward:
+        current_reward = Decimal(round(current_reward + jump_value, 2))
+        # with the current reward, we need to create a board and a new mdp to send to policiy evaluation
+        # creating a new mdp with the updated board
         current_board = create_board_with_reward(mdp, current_reward)
         current_mdp = deepcopy(mdp)
         current_mdp.board = current_board
 
-        #calculate policy for current reward
-        #TODO: not sure which function we should use to calculate current policy. currently we use get_policy, but maybe we need get_all
-        #calculating the policy with value_iteration and get_policy, and if policy changed, add the reward to the list
+        # calculate policy for current reward
+        # TODO: not sure which function we should use to calculate current policy. currently we use get_policy, but maybe we need get_all
+        # calculating the policy with value_iteration and get_policy, and if policy changed, add the reward to the list
         current_util = value_iteration(current_mdp, initial_utility)
-        current_policy = get_policy(current_mdp, current_util)
-        #if the polict changed from the alst one
+        _, current_policy = get_all_policies_letters_sorted(current_mdp, current_util, epsilon)
+        # if the policy changed from the last one
         changed = policy_changed(current_mdp, prev_policy, current_policy)
         if changed:
-            all_rewards.append(current_reward)
-        #setting the current to be prev
+            all_rewards.append(float(current_reward))
+        # setting the current to be prev
         prev_policy = current_policy
+
     return all_rewards
     # ========================
