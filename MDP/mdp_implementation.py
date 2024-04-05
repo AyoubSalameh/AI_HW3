@@ -177,7 +177,7 @@ def get_all_policies_letters_sorted(mdp, U, epsilon):  # You can add more input 
 
     # ====== YOUR CODE: ======
     round_by = len(str(epsilon).split(".")[1]) + 1
-    p_dict = {'UP': 'U', 'DOWN': 'D', 'RIGHT': 'R', 'LEFT': 'L'}
+    arrow_dict = {'UP': 'U', 'DOWN': 'D', 'RIGHT': 'R', 'LEFT': 'L'}
     pi = deepcopy(U)
     count = 1
     for i in range(mdp.num_row):
@@ -186,20 +186,17 @@ def get_all_policies_letters_sorted(mdp, U, epsilon):  # You can add more input 
                 pi[i][j] = None
                 continue
 
-            '''different version'''
-            cur_reward = float(mdp.board[i][j])
-            possible_op = []
+            utility_actions = {}
             for a in mdp.actions.keys():
-                # TODO: here we should round based on epsilon we get as param. num of digits after the point + 1
                 cur = calculate_sum(mdp, U, i, j, a)
-                # need to add the operation if bellman equation is true for it
-                if abs(round(U[i][j], round_by) - round(cur_reward + mdp.gamma * cur, round_by)) < epsilon:
-                    possible_op.append(p_dict[a])
-            pi[i][j] = ''.join(sorted(possible_op))
-            count *= len(possible_op)
-
+                utility_actions[a] = cur
+            max_utility = max(utility_actions.values())
+            max_actions = [act for act in mdp.actions.keys() if
+                           round(utility_actions[act], round_by) >= round(max_utility, round_by) - epsilon]
+            count *= len(max_actions)
+            max_actions.sort()
+            pi[i][j] = ''.join([arrow_dict[action] for action in max_actions])
     return count, pi
-
 
 def get_all_policies(mdp, U, epsilon):  # You can add more input parameters as needed
     # TODO:
@@ -212,9 +209,8 @@ def get_all_policies(mdp, U, epsilon):  # You can add more input parameters as n
 
     # ====== YOUR CODE: ======
     round_by = len(str(epsilon).split(".")[1]) + 1
-    dict = {'UP': '↑', 'DOWN': '↓', 'RIGHT': '→', 'LEFT': '←'}
+    arrow_dict = {'UP': '↑', 'DOWN': '↓', 'RIGHT': '→', 'LEFT': '←'}
     pi = deepcopy(U)
-    # TODO: is this print supposed to br here?
     count = 1
     for i in range(mdp.num_row):
         for j in range(mdp.num_col):
@@ -223,16 +219,16 @@ def get_all_policies(mdp, U, epsilon):  # You can add more input parameters as n
                 continue
 
             '''different version'''
-            cur_reward = float(mdp.board[i][j])
-            possible_op = ''
+            utility_actions = {}
             for a in mdp.actions.keys():
                 # TODO: here we should round based on epsilon we get as param. num of digits after the point + 1
                 cur = calculate_sum(mdp, U, i, j, a)
+                utility_actions[a] = cur
                 # need to add the operation if bellman equation is true for it
-                if abs(round(U[i][j], round_by) - round(cur_reward + mdp.gamma * cur, round_by)) < epsilon:
-                    possible_op += dict[a]
-            pi[i][j] = possible_op
-            count *= len(possible_op)
+            max_utility = max(utility_actions.values())
+            max_actions = [act for act in mdp.actions.keys() if round(utility_actions[act], round_by) >= round(max_utility, round_by) - epsilon]
+            count *= len(max_actions)
+            pi[i][j] = ''.join([arrow_dict[action] for action in max_actions])
 
             """another diff version"""
             # ops = ''
