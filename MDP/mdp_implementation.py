@@ -303,9 +303,12 @@ def get_policy_for_different_rewards(mdp, epsilon):  # You can add more input pa
     prev_policy = None
     # initial utility to send to value_iteration
     initial_utility = [[0] * mdp.num_col for i in range(mdp.num_col)]
-    for terminal_state in mdp.terminal_states:
-        row, col = terminal_state
-        initial_utility[row][col] = float(mdp.board[row][col])
+    init_flag = True
+    # for terminal_state in mdp.terminal_states:
+    #     init_flag = False
+    #     row, col = terminal_state
+    #     initial_utility[row][col] = float(mdp.board[row][col])
+
 
     while current_reward <= max_reward:
         current_reward = Decimal(round(current_reward + jump_value, 2))
@@ -319,7 +322,25 @@ def get_policy_for_different_rewards(mdp, epsilon):  # You can add more input pa
         # TODO: not sure which function we should use to calculate current policy. currently we use get_policy, but maybe we need get_all
         # calculating the policy with value_iteration and get_policy, and if policy changed, add the reward to the list
         current_util = value_iteration(current_mdp, initial_utility)
+        if current_reward == Decimal('-0.01'):
+            print('\nutil for -0.01 U_init only zero ? ', init_flag)
+            print(current_mdp.terminal_states)
+            mdp.print_utility(current_util)
+
+        if current_reward == Decimal('0.00'):
+            print('\nutil for 0 U_init only zero ? ', init_flag)
+            print(current_mdp.terminal_states)
+            mdp.print_utility(current_util)
+
         _, current_policy = get_all_policies_letters_sorted(current_mdp, current_util, epsilon)
+        if current_reward == Decimal('-0.01'):
+            print('\npolicy for -0.01 U_init only zero ? ', init_flag)
+            mdp.print_policy(current_policy)
+
+        if current_reward == Decimal('0.00'):
+            print('\npolicy for 0 U_init only zero ? ', init_flag)
+            mdp.print_policy(current_policy)
+
         # if the policy changed from the last one
         changed = policy_changed(current_mdp, prev_policy, current_policy)
         if changed:
