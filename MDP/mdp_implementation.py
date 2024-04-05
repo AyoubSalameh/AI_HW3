@@ -319,9 +319,15 @@ def get_policy_for_different_rewards(mdp, epsilon):  # You can add more input pa
         # if the policy changed from the last one
         changed = policy_changed(current_mdp, prev_policy, current_policy)
         if changed:
+            prev_reward = -5.0 if not all_rewards else all_rewards[-1]
+            print(prev_reward, "<= R(s) <", current_reward)
+            mdp.print_policy(prev_policy)
             all_rewards.append(float(current_reward))
         # setting the current to be prev
         prev_policy = current_policy
+    prev_reward = -5.0 if not all_rewards else all_rewards[-1]
+    print(prev_reward, "<= R(s) <", max_reward)
+    mdp.print_policy(current_policy)
 
     return all_rewards
     # ========================

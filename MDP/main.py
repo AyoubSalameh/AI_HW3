@@ -105,8 +105,8 @@ def example_driver():
     # _, p2 = get_all_policies_letters_sorted(mdp, U_new, 10 ** -3)
     # mdp.print_policy(p2)
     #
-    # r_list = get_policy_for_different_rewards(mdp, 10 ** -3)
-    # print(r_list)
+    r_list = get_policy_for_different_rewards(mdp, 10 ** -3)
+    print(r_list)
 
 if __name__ == '__main__':
 
