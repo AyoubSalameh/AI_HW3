@@ -96,6 +96,10 @@ def example_driver():
 
     print("Done!")
 
+    U_for_get_all = [[0.749, 0.819, 0.876, 1.0],
+        [0.692, 0, 0.564, -1.0],
+        [0.623, 0.566, 0.518, 0.252]]
+    print(get_all_policies(mdp, U_for_get_all, 10**(-3)))
     # mdp.print_policy(get_all_policies(mdp, U_new))
     #
     # print("\nall_policies:")

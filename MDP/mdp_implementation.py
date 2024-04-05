@@ -186,6 +186,7 @@ def get_all_policies_letters_sorted(mdp, U, epsilon):  # You can add more input 
                 pi[i][j] = None
                 continue
 
+            max_util = max([calculate_sum(mdp, U, i, j, action) for action in mdp.actions.keys()])
             '''different version'''
             cur_reward = float(mdp.board[i][j])
             possible_op = []
@@ -193,7 +194,7 @@ def get_all_policies_letters_sorted(mdp, U, epsilon):  # You can add more input 
                 # TODO: here we should round based on epsilon we get as param. num of digits after the point + 1
                 cur = calculate_sum(mdp, U, i, j, a)
                 # need to add the operation if bellman equation is true for it
-                if abs(round(U[i][j], round_by) - round(cur_reward + mdp.gamma * cur, round_by)) < epsilon:
+                if abs(round(max_util, round_by) - round(cur, round_by)) < epsilon:
                     possible_op.append(p_dict[a])
             pi[i][j] = ''.join(sorted(possible_op))
             count *= len(possible_op)
@@ -201,7 +202,7 @@ def get_all_policies_letters_sorted(mdp, U, epsilon):  # You can add more input 
     return count, pi
 
 
-def get_all_policies(mdp, U, epsilon):  # You can add more input parameters as needed
+def get_all_policies(mdp, U, epsilon = 10**(-3)):  # You can add more input parameters as needed
     # TODO:
     # Given the mdp, and the utility value U (which satisfies the Belman equation)
     # print / display all the policies that maintain this value
@@ -222,6 +223,7 @@ def get_all_policies(mdp, U, epsilon):  # You can add more input parameters as n
                 pi[i][j] = None
                 continue
 
+            max_util = max([calculate_sum(mdp, U, i, j, action) for action in mdp.actions.keys()])
             '''different version'''
             cur_reward = float(mdp.board[i][j])
             possible_op = ''
@@ -229,35 +231,10 @@ def get_all_policies(mdp, U, epsilon):  # You can add more input parameters as n
                 # TODO: here we should round based on epsilon we get as param. num of digits after the point + 1
                 cur = calculate_sum(mdp, U, i, j, a)
                 # need to add the operation if bellman equation is true for it
-                if abs(round(U[i][j], round_by) - round(cur_reward + mdp.gamma * cur, round_by)) < epsilon:
+                if abs(round(max_util, round_by) - round(cur, round_by)) < epsilon:
                     possible_op += dict[a]
             pi[i][j] = possible_op
             count *= len(possible_op)
-
-            """another diff version"""
-            # ops = ''
-            # max_sum = max([calculate_sum(mdp, U, i, j, action) for action in mdp.actions.keys()])
-            # for a in mdp.actions.keys():
-            #     cur = calculate_sum(mdp, U, i, j, a)
-            #     if abs(cur - max_sum) < 10 ** (-3):
-            #         ops += dict[a]
-            # pi[i][j] = ops
-            # count *= len(ops)
-
-            # cur_max = float('-inf')
-            # #print(i, j)
-            # for a in mdp.actions.keys():
-            #     cur = calculate_sum(mdp, U, i, j, a)
-            #     if cur >= cur_max:
-            #         if cur == cur_max:
-            #             #print("concatenating", dict[a], a)
-            #             count+=1
-            #             pi[i][j] = (pi[i][j]) + dict[a]
-            #             #print(pi[i][j])
-            #         else:
-            #             #print("replacing ׳ןאי", dict[a], a)
-            #             cur_max = cur
-            #             pi[i][j] = dict[a]
     mdp.print_policy(pi)
     return count
     # ========================
