@@ -14,8 +14,8 @@ from sklearn.model_selection import KFold
 ========================================================================
 """
 
-ID1 = 123456789  # TODO: change it to your personal ID 
-ID2 = 987654321  # TODO: change it to your personal ID 
+ID1 = 209515220  # TODO: change it to your personal ID
+ID2 = 987654321  # TODO: change it to your personal ID 318307212
 
 
 ID_KEY = ID1+ID2%1000000000
