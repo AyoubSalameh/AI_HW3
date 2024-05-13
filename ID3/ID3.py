@@ -144,7 +144,14 @@ class ID3:
         true_branch, false_branch = None, None
 
         # ====== YOUR CODE: ======
-        raise NotImplementedError
+        if self.entropy(rows, labels) == 0:
+            return Leaf(rows, labels)
+        best_gain, best_question, best_true_rows, best_true_labels, best_false_rows, best_false_labels = self.find_best_split(rows, labels)
+
+        #TODO: might need to make everything into a np array
+        true_branch = self.build_tree(best_true_rows, best_true_labels)
+        false_branch = self.build_tree(best_false_rows, best_false_labels)
+
         # ========================
 
         return DecisionNode(best_question, true_branch, false_branch)
