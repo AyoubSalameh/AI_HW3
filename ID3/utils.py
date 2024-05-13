@@ -42,7 +42,10 @@ def accuracy(y: np.array, y_pred: np.array):
     assert y.ndim == 1
 
     # ====== YOUR CODE: ======
-    raise NotImplementedError
+
+    correct_predictions = np.sum(y == y_pred)
+    accuracy_val = correct_predictions / len(y)
+
     # ========================
 
     return accuracy_val
