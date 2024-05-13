@@ -60,8 +60,8 @@ class ID3:
         info_gain_value = 0.0
         # ====== YOUR CODE: ======
         total_labels = len(left_labels) + len(right_labels)
-        left_child_entropy = ID3.entropy(left, left_labels)
-        right_child_entropy = ID3.entropy(right, right_labels)
+        left_child_entropy = self.entropy(left, left_labels)
+        right_child_entropy = self.entropy(right, right_labels)
         info_gain_value = (current_uncertainty
                            - (len(left_labels) / total_labels) * left_child_entropy
                            - (len(right_labels) / total_labels) * right_child_entropy)
@@ -87,7 +87,15 @@ class ID3:
         assert len(rows) == len(labels), 'Rows size should be equal to labels size.'
 
         # ====== YOUR CODE: ======
-        raise NotImplementedError
+        for i in range(len(rows)):
+            if question.match(rows[i]):
+                true_rows += rows[i]
+                true_labels += labels[i]
+            else:
+                false_rows += rows[i]
+                false_labels += labels[i]
+
+        gain = self.info_gain(true_rows, true_labels, false_rows, false_labels, current_uncertainty)
         # ========================
 
         return gain, true_rows, true_labels, false_rows, false_labels
