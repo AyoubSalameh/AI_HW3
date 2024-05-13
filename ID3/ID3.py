@@ -95,6 +95,11 @@ class ID3:
                 false_rows += rows[i]
                 false_labels += labels[i]
 
+        true_rows = np.array(true_rows)
+        true_labels = np.array(true_labels)
+        false_rows = np.array(false_rows)
+        false_labels = np.array(false_labels)
+
         gain = self.info_gain(true_rows, true_labels, false_rows, false_labels, current_uncertainty)
         # ========================
 
