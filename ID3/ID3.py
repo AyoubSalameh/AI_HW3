@@ -32,7 +32,10 @@ class ID3:
         impurity = 0.0
 
         # ====== YOUR CODE: ======
-        raise NotImplementedError
+        total_examples = len(rows)
+        for label in counts:
+            prob = counts[label] / total_examples
+            impurity -= prob * math.log2(prob)
         # ========================
 
         return impurity
@@ -56,7 +59,12 @@ class ID3:
 
         info_gain_value = 0.0
         # ====== YOUR CODE: ======
-        raise NotImplementedError
+        total_labels = len(left_labels) + len(right_labels)
+        left_child_entropy = ID3.entropy(left, left_labels)
+        right_child_entropy = ID3.entropy(right, right_labels)
+        info_gain_value = (current_uncertainty
+                           - (len(left_labels) / total_labels) * left_child_entropy
+                           - (len(right_labels) / total_labels) * right_child_entropy)
         # ========================
 
         return info_gain_value
