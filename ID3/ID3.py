@@ -196,7 +196,13 @@ class ID3:
         prediction = None
 
         # ====== YOUR CODE: ======
-        raise NotImplementedError
+        if isinstance(node, Leaf):
+            return max(node.predictions, key = node.predictions.get)
+        else:
+            if node.question.match(row):
+                prediction = self.predict_sample(row, node.true_branch)
+            else:
+                prediction = self.predict_sample(row, node.false_branch)
         # ========================
 
         return prediction
@@ -213,7 +219,7 @@ class ID3:
         y_pred = None
 
         # ====== YOUR CODE: ======
-        raise NotImplementedError
+        y_pred = [self.predict_sample(row, self.tree_root) for row in rows]
         # ========================
 
         return y_pred
