@@ -223,4 +223,4 @@ class ID3:
         y_pred = [self.predict_sample(row, self.tree_root) for row in rows]
         # ========================
 
-        return y_pred
+        return np.array(y_pred)
