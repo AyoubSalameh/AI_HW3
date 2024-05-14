@@ -151,7 +151,7 @@ if __name__ == '__main__':
        (*) To run the cross validation experiment over the  M pruning hyper-parameter 
            uncomment below code and run it
            modify the value from False to True to plot the experiment result
-    # """
+    """
     # plot_graphs = True
     # best_m = cross_validation_experiment(plot_graph=plot_graphs)
     # print(f'best_m = {best_m}')

@@ -208,4 +208,4 @@ if __name__ == '__main__':
     test_fit(attributes_names, x_train, y_train)
     test_predict_sample(attributes_names, x_train, y_train, x_test)
     test_predict(attributes_names, x_train, y_train, x_test, y_test)
-    # test_min_for_pruning(attributes_names, x_train, y_train)
+    test_min_for_pruning(attributes_names, x_train, y_train)

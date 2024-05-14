@@ -158,7 +158,7 @@ class ID3:
         true_branch, false_branch = None, None
 
         # ====== YOUR CODE: ======
-        if self.entropy(rows, labels) == 0:
+        if self.entropy(rows, labels) == 0 or len(rows) < self.min_for_pruning:
             return Leaf(rows, labels)
         best_gain, best_question, best_true_rows, best_true_labels, best_false_rows, best_false_labels = self.find_best_split(rows, labels)
 
