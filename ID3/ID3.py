@@ -87,13 +87,14 @@ class ID3:
         assert len(rows) == len(labels), 'Rows size should be equal to labels size.'
 
         # ====== YOUR CODE: ======
+        true_rows, true_labels, false_rows, false_labels = [], [], [], []
         for i in range(len(rows)):
             if question.match(rows[i]):
-                true_rows += rows[i]
-                true_labels += labels[i]
+                true_rows.append(rows[i])
+                true_labels.append(labels[i])
             else:
-                false_rows += rows[i]
-                false_labels += labels[i]
+                false_rows.append(rows[i])
+                false_labels.append(labels[i])
 
         true_rows = np.array(true_rows)
         true_labels = np.array(true_labels)
@@ -103,7 +104,7 @@ class ID3:
         gain = self.info_gain(true_rows, true_labels, false_rows, false_labels, current_uncertainty)
         # ========================
 
-        return
+        return gain, true_rows, true_labels, false_rows, false_labels
 
     def find_best_split(self, rows, labels):
         """
@@ -125,9 +126,9 @@ class ID3:
         number_of_features = rows.shape[1]
         for curr_col in range(number_of_features):
             features = sorted(rows[:, curr_col])
-            thresholds = [0.5 * (features[idx] + features[idx + 1]) for idx in range(number_of_features - 1)]
+            thresholds = [0.5 * (features[idx] + features[idx + 1]) for idx in range(len(features) - 1)]
             for threshold in thresholds:
-                question = Question(None, curr_col, threshold)
+                question = Question(self.label_names[curr_col], curr_col, threshold)
                 gain, true_rows, true_labels, false_rows, false_labels = self.partition(rows, labels, question, current_uncertainty)
                 if gain >= best_gain:
                     best_gain = gain
