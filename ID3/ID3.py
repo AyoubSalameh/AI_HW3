@@ -103,7 +103,7 @@ class ID3:
         gain = self.info_gain(true_rows, true_labels, false_rows, false_labels, current_uncertainty)
         # ========================
 
-        return gain, true_rows, true_labels, false_rows, false_labels
+        return
 
     def find_best_split(self, rows, labels):
         """
@@ -122,7 +122,20 @@ class ID3:
         current_uncertainty = self.entropy(rows, labels)
 
         # ====== YOUR CODE: ======
-        raise NotImplementedError
+        number_of_features = rows.shape[1]
+        for curr_col in range(number_of_features):
+            features = sorted(rows[:, curr_col])
+            thresholds = [0.5 * (features[idx] + features[idx + 1]) for idx in range(number_of_features - 1)]
+            for threshold in thresholds:
+                question = Question(None, curr_col, threshold)
+                gain, true_rows, true_labels, false_rows, false_labels = self.partition(rows, labels, question, current_uncertainty)
+                if gain >= best_gain:
+                    best_gain = gain
+                    best_question = question
+                    best_true_rows = true_rows
+                    best_true_labels = true_labels
+                    best_false_rows = false_rows
+                    best_false_labels = false_labels
         # ========================
 
         return best_gain, best_question, best_true_rows, best_true_labels, best_false_rows, best_false_labels
