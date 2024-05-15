@@ -4,7 +4,7 @@ from utils import *
 """
 Make the imports of python packages needed
 """
-
+from sklearn.model_selection import KFold
 """
 ========================================================================
 ========================================================================
@@ -39,7 +39,15 @@ def find_best_pruning_m(train_dataset: np.array, m_choices, num_folds=5):
         #  or implement something else.
 
         # ====== YOUR CODE: ======
-        raise NotImplementedError
+        kf = KFold(n_splits=5, shuffle=True, random_state=209515220)
+        current_acc = []
+        for dl_train, dl_valid in create_train_validation_split(train_dataset, kf):
+            x_train, y_train, x_test, y_test = get_dataset_split(dl_train, dl_valid, target_attribute)
+            model.fit(x_train, y_train)
+            y_pred = model.predict(x_test)
+            acc = accuracy(y_test, y_pred)
+            current_acc.append(acc)
+        accuracies.append(current_acc)
         # ========================
 
     best_m_idx = np.argmax([np.mean(acc) for acc in accuracies])
@@ -62,7 +70,7 @@ def basic_experiment(x_train, y_train, x_test, y_test, formatted_print=False):
     acc = None
 
     # ====== YOUR CODE: ======
-    tree = ID3(attributes_names)
+    tree = ID3(label_names=attributes_names)
     tree.fit(x_train, y_train)
     y_pred = tree.predict(x_test)
     acc = accuracy(y_test, y_pred)
@@ -92,9 +100,11 @@ def cross_validation_experiment(plot_graph=True):
     num_folds = 5
 
     # ====== YOUR CODE: ======
-    assert len(m_choices) >= 5, 'fill the m_choices list with  at least 5 different values for M.'
-    raise NotImplementedError
+    m_choices = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
+    assert len(m_choices) >= 5, 'fill the m_choices list with  at least 5 different values for M.'
+
+    best_m, accuracies = find_best_pruning_m(train_dataset, m_choices, num_folds)
     # ========================
     accuracies_mean = np.array([np.mean(acc) * 100 for acc in accuracies])
     if plot_graph:
@@ -127,7 +137,10 @@ def best_m_test(x_train, y_train, x_test, y_test, min_for_pruning):
     acc = None
 
     # ====== YOUR CODE: ======
-    raise NotImplementedError
+    tree = ID3(min_for_pruning=min_for_pruning, label_names=attributes_names)
+    tree.fit(x_train, y_train)
+    y_pred = tree.predict(x_test)
+    acc = accuracy(y_test, y_pred)
     # ========================
 
     return acc
