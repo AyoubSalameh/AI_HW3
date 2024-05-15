@@ -165,14 +165,14 @@ if __name__ == '__main__':
            uncomment below code and run it
            modify the value from False to True to plot the experiment result
     """
-    # plot_graphs = True
-    # best_m = cross_validation_experiment(plot_graph=plot_graphs)
-    # print(f'best_m = {best_m}')
-    #
-    # """
-    #     pruning experiment, run with the best parameter
-    #     (*) To run the experiment uncomment below code and run it
-    # """
-    # acc = best_m_test(*data_split, min_for_pruning=best_m)
-    # assert acc > 0.95, 'you should get an accuracy of at least 95% for the pruned ID3 decision tree'
-    # print(f'Test Accuracy: {acc * 100:.2f}%' if formatted_print else acc)
+    plot_graphs = True
+    best_m = cross_validation_experiment(plot_graph=plot_graphs)
+    print(f'best_m = {best_m}')
+
+    """
+        pruning experiment, run with the best parameter
+        (*) To run the experiment uncomment below code and run it
+    """
+    acc = best_m_test(*data_split, min_for_pruning=best_m)
+    assert acc > 0.95, 'you should get an accuracy of at least 95% for the pruned ID3 decision tree'
+    print(f'Test Accuracy: {acc * 100:.2f}%' if formatted_print else acc)
