@@ -123,9 +123,11 @@ class ID3:
         current_uncertainty = self.entropy(rows, labels)
 
         # ====== YOUR CODE: ======
-        number_of_features = rows.shape[1]
+        number_of_features = rows.shape[1]   # rows.shape = (number_of_rows, number_of_columns)
         for curr_col in range(number_of_features):
-            features = sorted(rows[:, curr_col])
+            features = sorted(rows[:, curr_col])  # sorts the values of that feature across all samples
+
+            # computes potential threshold values for splitting the data by averaging adjacent sorted values:
             thresholds = [0.5 * (features[idx] + features[idx + 1]) for idx in range(len(features) - 1)]
             for threshold in thresholds:
                 question = Question(self.label_names[curr_col], curr_col, threshold)
@@ -158,11 +160,12 @@ class ID3:
         true_branch, false_branch = None, None
 
         # ====== YOUR CODE: ======
-        if self.entropy(rows, labels) == 0 or len(rows) < self.min_for_pruning:
+        if len(class_counts(rows, labels)) == 1 or self.entropy(rows, labels) == 0 or len(rows) < self.min_for_pruning:
             return Leaf(rows, labels)
         best_gain, best_question, best_true_rows, best_true_labels, best_false_rows, best_false_labels = self.find_best_split(rows, labels)
 
-        #TODO: might need to make everything into a np array
+        # TODO: might need to make everything into a np array
+        # i think partition already takes care of it
         true_branch = self.build_tree(best_true_rows, best_true_labels)
         false_branch = self.build_tree(best_false_rows, best_false_labels)
 
@@ -198,7 +201,7 @@ class ID3:
 
         # ====== YOUR CODE: ======
         if isinstance(node, Leaf):
-            return max(node.predictions, key = node.predictions.get)
+            return max(node.predictions, key = node.predictions.get)  # returns the class with the highest count - the majority class
         else:
             if node.question.match(row):
                 prediction = self.predict_sample(row, node.true_branch)
