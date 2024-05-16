@@ -133,7 +133,7 @@ class ID3:
                 question = Question(self.label_names[curr_col], curr_col, threshold)
                 gain, true_rows, true_labels, false_rows, false_labels = self.partition(rows, labels, question, current_uncertainty)
                 #TODO: with >= we get 92.23 accuracy, with > we get 95.15
-                if gain > best_gain:
+                if gain >= best_gain:
                     best_gain = gain
                     best_question = question
                     best_true_rows = true_rows
