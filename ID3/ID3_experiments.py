@@ -31,7 +31,7 @@ def find_best_pruning_m(train_dataset: np.array, m_choices, num_folds=5):
     for i, m in enumerate(m_choices):
         model = ID3(label_names=attributes_names, min_for_pruning=m)
         # TODO:
-        #  - Add a KFold instance of sklearn.model_selection, pass <ID> as random_state argument.
+        #  - Add a KFold instance of sklearn.model_selection, pass <ID_KEY> as random_state argument.
         #  - Train model num_folds times with different train/val data.
         #  Don't use any third-party libraries.
         #  You can use create_train_validation_split train/validation splitter from utils.py
@@ -39,7 +39,7 @@ def find_best_pruning_m(train_dataset: np.array, m_choices, num_folds=5):
         #  or implement something else.
 
         # ====== YOUR CODE: ======
-        kf = KFold(n_splits=5, shuffle=True, random_state=209515220)
+        kf = KFold(n_splits=5, shuffle=True, random_state=ID_KEY)
         current_acc = []
         for dl_train, dl_valid in create_train_validation_split(train_dataset, kf):
             x_train, y_train, x_test, y_test = get_dataset_split(dl_train, dl_valid, target_attribute)

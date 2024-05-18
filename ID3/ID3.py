@@ -29,26 +29,26 @@ class ID3:
         #  - You can use counts as a helper dictionary of label -> count, or implement something else.
 
         counts = class_counts(rows, labels)
-        impurity = 0.0
+        _entropy = 0.0
 
         # ====== YOUR CODE: ======
         total_examples = len(rows)
         for label in counts:
             prob = counts[label] / total_examples
-            impurity -= prob * math.log2(prob)
+            _entropy -= prob * math.log2(prob)
         # ========================
 
-        return impurity
+        return _entropy
 
-    def info_gain(self, left, left_labels, right, right_labels, current_uncertainty):
+    def info_gain(self, left, left_labels, right, right_labels, current_info_gain=None):
         """
-        Calculate the information gain, as the uncertainty of the starting node, minus the weighted impurity of
+        Calculate the information gain, as the current info gain of the starting node, minus the weighted entropy of
         two child nodes.
         :param left: the left child rows.
         :param left_labels: the left child labels.
         :param right: the right child rows.
         :param right_labels: the right child labels.
-        :param current_uncertainty: the current uncertainty of the current node
+        :param current_info_gain: the current info gain of the current node
         :return: the info gain for splitting the current node into the two children left and right.
         """
         # TODO:
@@ -62,7 +62,7 @@ class ID3:
         total_labels = len(left_labels) + len(right_labels)
         left_child_entropy = self.entropy(left, left_labels)
         right_child_entropy = self.entropy(right, right_labels)
-        info_gain_value = (current_uncertainty
+        info_gain_value = (current_info_gain
                            - (len(left_labels) / total_labels) * left_child_entropy
                            - (len(right_labels) / total_labels) * right_child_entropy)
         # ========================
