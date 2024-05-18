@@ -42,13 +42,13 @@ class ID3:
 
     def info_gain(self, left, left_labels, right, right_labels, current_info_gain=None):
         """
-        Calculate the information gain, as the current info gain of the starting node, minus the weighted entropy of
+        Calculate the information gain, as the current_info_gain of the starting node, minus the weighted entropy of
         two child nodes.
         :param left: the left child rows.
         :param left_labels: the left child labels.
         :param right: the right child rows.
         :param right_labels: the right child labels.
-        :param current_info_gain: the current info gain of the current node
+        :param current_info_gain: the current info_gain of the current node
         :return: the info gain for splitting the current node into the two children left and right.
         """
         # TODO:
@@ -224,7 +224,7 @@ class ID3:
         y_pred = None
 
         # ====== YOUR CODE: ======
-        y_pred = [self.predict_sample(row, self.tree_root) for row in rows]
+        y_pred = np.array([self.predict_sample(row, self.tree_root) for row in rows])
         # ========================
 
-        return np.array(y_pred)
+        return y_pred
