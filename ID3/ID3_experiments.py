@@ -100,7 +100,7 @@ def cross_validation_experiment(plot_graph=True):
     num_folds = 5
 
     # ====== YOUR CODE: ======
-    m_choices = [300, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    m_choices = [20, 30, 40, 50, 60, 70, 80, 90, 100]
 
     assert len(m_choices) >= 5, 'fill the m_choices list with  at least 5 different values for M.'
 
@@ -166,7 +166,7 @@ if __name__ == '__main__':
            modify the value from False to True to plot the experiment result
     """
 
-    plot_graphs = False
+    plot_graphs = True
     best_m = cross_validation_experiment(plot_graph=plot_graphs)
     print(f'best_m = {best_m}')
 
