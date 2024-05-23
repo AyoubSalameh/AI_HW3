@@ -106,6 +106,17 @@ class ID3:
 
         return gain, true_rows, true_labels, false_rows, false_labels
 
+    def get_question_name(self, question_index: int):
+        """
+        Get the question name from the label_names list.
+        :param question_index: the index of the question.
+        :return: the question name.
+        """
+        if (self.target_attribute not in self.label_names or
+                question_index < self.label_names.index(self.target_attribute)):
+            return self.label_names[question_index]
+        return self.label_names[question_index + 1]
+
     def find_best_split(self, rows, labels):
         """
         Find the best question to ask by iterating over every feature / value and calculating the information gain.
@@ -125,13 +136,16 @@ class ID3:
         # ====== YOUR CODE: ======
         number_of_features = rows.shape[1]   # rows.shape = (number_of_rows, number_of_columns)
         for curr_col in range(number_of_features):
-            #features = np.unique(sorted(rows[:, curr_col]))  # sorts the values of that feature across all samples
+            # features = np.unique(sorted(rows[:, curr_col]))  # sorts the values of that feature across all samples
             features = sorted(unique_vals(rows, curr_col))
+            # features = sorted(rows[:, curr_col])
 
             # computes potential threshold values for splitting the data by averaging adjacent sorted values:
             thresholds = [0.5 * (features[idx] + features[idx+1]) for idx in range(len(features) - 1)]
             for threshold in thresholds:
-                question = Question(self.label_names[curr_col], curr_col, threshold)
+                # question = Question(self.label_names[curr_col], curr_col, threshold)
+                # https://piazza.com/class/lrurdsbmuiww0/post/511
+                question = Question(self.get_question_name(curr_col), curr_col, threshold)
                 gain, true_rows, true_labels, false_rows, false_labels = self.partition(rows, labels, question, current_uncertainty)
                 #TODO: with >= we get 92.23 accuracy, with > we get 95.15
                 if gain >= best_gain:
