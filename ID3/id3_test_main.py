@@ -91,7 +91,7 @@ def test_partition(attributes_names, x_train, y_train):
     # Lets see the partition it brings us
     gain, true_rows, true_labels, false_rows, false_labels = id3.partition(rows_arr, label_arr, question, parent_entropy)
 
-    print(f"Gain: {gain}, amount true {true_rows.shape[0]}, amount false {false_rows.shape[0]}")
+    print(f"Gain: {gain}, amount true {len(true_rows)}, amount false {len(false_rows)}")
     print(f"True include {class_counts(true_rows, true_labels)}")
     print(f"False include {class_counts(false_rows, false_labels)}")
     
@@ -175,6 +175,7 @@ def test_min_for_pruning(attributes_names, x_train, y_train):
     # Keep first 10 people and only first 3 features for simplicity in testing
     rows = np.array(x_train[0:20, 0:4]) 
     labels = np.array(y_train[0:20])
+    #print(f"Testing on: \n{rows} \nLabels are: \n{labels}")
     id3.fit(rows, labels)
     helper_print_tree(id3.tree_root)
 

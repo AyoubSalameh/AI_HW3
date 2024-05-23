@@ -1,6 +1,6 @@
 import math
 
-from DecisonTree import Leaf, Question, DecisionNode, class_counts
+from DecisonTree import Leaf, Question, DecisionNode, class_counts, unique_vals
 from utils import *
 
 """
@@ -125,10 +125,11 @@ class ID3:
         # ====== YOUR CODE: ======
         number_of_features = rows.shape[1]   # rows.shape = (number_of_rows, number_of_columns)
         for curr_col in range(number_of_features):
-            features = sorted(rows[:, curr_col])  # sorts the values of that feature across all samples
+            #features = np.unique(sorted(rows[:, curr_col]))  # sorts the values of that feature across all samples
+            features = sorted(unique_vals(rows, curr_col))
 
             # computes potential threshold values for splitting the data by averaging adjacent sorted values:
-            thresholds = [0.5 * (features[idx] + features[idx + 1]) for idx in range(len(features) - 1)]
+            thresholds = [0.5 * (features[idx] + features[idx+1]) for idx in range(len(features) - 1)]
             for threshold in thresholds:
                 question = Question(self.label_names[curr_col], curr_col, threshold)
                 gain, true_rows, true_labels, false_rows, false_labels = self.partition(rows, labels, question, current_uncertainty)
